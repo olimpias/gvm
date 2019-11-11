@@ -1,12 +1,15 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
+	"strings"
 )
 
 const (
@@ -17,6 +20,16 @@ const (
 	downloadFileVersion = "go%s"
 	downloadFileOSArch  = ".%s-%s.tar.gz"
 	downloadFileOSArchW = ".%s-%s.zip"
+
+	unixBashSourceCmd  = "source"
+	unixBashProfile    = ".bash_profile"
+	unixExportPath     = "export PATH=$PATH:/usr/local/go/bin"
+	unixExtractCommand = "tar -C /usr/local -xzf %s"
+)
+
+var (
+	ErrVersionIsNotFound     = errors.New("version is not found")
+	ErrBashProfileAlreadySet = errors.New("bash profile has already been set")
 )
 
 type FileManagement struct {
@@ -103,7 +116,57 @@ func (fm *FileManagement) ListVersions() ([]string, error) {
 }
 
 func (fm *FileManagement) MoveFiles(useVersion string) error {
-	return nil
+	fileName := getCompressedFileName(useVersion)
+	filePath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return ErrVersionIsNotFound
+	}
+	command := fmt.Sprintf(unixExtractCommand, filePath)
+	if isWindowOS() {
+		//TODO handle windows OS.
+		/*
+			Windows
+			The Go project provides two installation options for Windows users (besides installing from source): a zip archive that requires you to set some environment variables and an MSI installer that configures your installation automatically.
+
+			MSI installer
+			Open the MSI file and follow the prompts to install the Go tools. By default, the installer puts the Go distribution in c:\Go.
+
+			The installer should put the c:\Go\bin directory in your PATH environment variable. You may need to restart any open command prompts for the change to take effect.
+
+			Zip archive
+			Download the zip file and extract it into the directory of your choice (we suggest c:\Go).
+
+			Add the bin subdirectory of your Go root (for example, c:\Go\bin) to your PATH environment variable.
+
+			Setting environment variables under Windows
+			Under Windows, you may set environment variables through the "Environment Variables" button on the "Advanced" tab of the "System" control panel. Some versions of Windows provide this control panel through the "Advanced System Settings" option inside the "System" control panel.
+		*/
+	}
+	commands := strings.Split(command, " ")
+	cmd := exec.Command(commands[0], commands[1:]...)
+	return cmd.Run()
+}
+
+func (fm *FileManagement) SetEnvVariable() error {
+	homePath := os.Getenv(home)
+	bashProfilePath := fmt.Sprintf("%s/%s", homePath, unixBashProfile)
+	f, err := os.OpenFile(bashProfilePath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	values, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	if strings.Contains(string(values), unixExportPath) {
+		return ErrBashProfileAlreadySet
+	}
+	if _, err := f.WriteString(unixExportPath); err != nil {
+		return err
+	}
+	cmd := exec.Command(unixBashSourceCmd, bashProfilePath)
+	return cmd.Run()
 }
 
 func isWindowOS() bool {

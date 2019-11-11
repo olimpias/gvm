@@ -1,6 +1,8 @@
 package cmd
 
-import "github.com/olimpias/gvm/common"
+import (
+	"github.com/olimpias/gvm/common"
+)
 
 type UseCommand struct {
 	fileManager *common.FileManagement
@@ -16,5 +18,11 @@ func (u *UseCommand) Validate() error {
 }
 
 func (u *UseCommand) Apply() error {
+	if err := u.fileManager.MoveFiles(u.version); err != nil {
+		return err
+	}
+	if err := u.fileManager.SetEnvVariable(); err != nil {
+		return err
+	}
 	return nil
 }

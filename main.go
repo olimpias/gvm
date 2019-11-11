@@ -42,14 +42,16 @@ func main() {
 		command = cmd.NewListCommand(fileManager)
 	default:
 		//err
+		fmt.Printf("Unknown command %s \n", os.Args[1])
 		os.Exit(2)
 	}
 	if err := command.Validate(); err != nil {
 		terminateWithErr(err)
 	}
 	if err := command.Apply(); err != nil {
-
+		terminateWithErr(err)
 	}
+	os.Exit(0)
 }
 
 func getVersionArg() (string, error) {
