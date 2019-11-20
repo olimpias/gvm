@@ -16,5 +16,5 @@ func (i *DLCommand) Validate() error {
 }
 
 func (i *DLCommand) Apply() error {
-	return i.fileManager.DownloadFile(i.version)
+	return i.fileManager.DownloadFileWithProgress(i.version)
 }

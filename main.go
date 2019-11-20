@@ -19,6 +19,7 @@ func main() {
 		os.Exit(2)
 	}
 	var command cmd.Command
+	//TODO add help
 	switch os.Args[1] {
 	case "dl":
 		ver, err := getVersionArg()

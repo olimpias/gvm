@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 const (
@@ -49,8 +51,21 @@ func New() (*FileManagement, error) {
 	return &FileManagement{directoryStorePath: storePath, osName: runtime.GOOS, archName: runtime.GOARCH}, nil
 }
 
-//TODO add progress bar
-func (fm *FileManagement) DownloadFile(version string) error {
+func (fm *FileManagement) downloadFile(URL string) (io.ReadCloser, int64, error) {
+	// Get the data
+	resp, err := http.Get(URL)
+	if err != nil {
+		return nil, 0, err
+	}
+	// Check server response
+	if resp.StatusCode != http.StatusOK {
+		return nil, 0, fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	return resp.Body, resp.ContentLength, nil
+}
+
+func (fm *FileManagement) DownloadFileWithProgress(version string) error {
 	fileName := getCompressedFileName(version)
 	downloadDirectoryPath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 	out, err := os.Create(downloadDirectoryPath)
@@ -58,21 +73,18 @@ func (fm *FileManagement) DownloadFile(version string) error {
 		return err
 	}
 	defer out.Close()
-
 	URL := fmt.Sprintf(downloadURL, fileName)
-	// Get the data
-	resp, err := http.Get(URL)
+	reader, fileSize, err := fm.downloadFile(URL)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer reader.Close()
 
-	// Check server response
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
-	}
+	bar := pb.Full.Start64(fileSize)
+	defer bar.Finish()
+	barReader := bar.NewProxyReader(reader)
 	// Writer the body to file
-	_, err = io.Copy(out, resp.Body)
+	_, err = io.Copy(out, barReader)
 	if err != nil {
 		return err
 	}
