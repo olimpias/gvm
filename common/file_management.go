@@ -3,11 +3,13 @@ package common
 import (
 	"errors"
 	"fmt"
+	"github.com/olimpias/gvm/windows"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -16,6 +18,7 @@ import (
 
 const (
 	storePath = ".gvm/"
+	tmpFile   = ".tmp"
 
 	home                = "HOME"
 	downloadURL         = "https://dl.google.com/go/%s"
@@ -23,13 +26,16 @@ const (
 	downloadFileOSArch  = ".%s-%s.tar.gz"
 	downloadFileOSArchW = ".%s-%s.zip"
 
-	unixBashSourceCmd  = "source"
-	unixBashProfile    = ".bash_profile"
-	unixExportPath     = "export PATH=$PATH:/usr/local/go/bin"
-	unixExtractCommand = "tar -C /usr/local -xzf %s"
+	unixBashSourceCmd = "source"
+	unixBashProfile   = ".bash_profile"
+	unixExportPath    = "export PATH=$PATH:/usr/local/go/bin"
+
+	extractCommand = "tar -C %s -zxvf %s"
 )
 
 var (
+	ErrNotFound = errors.New("Goroot is not found")
+
 	ErrVersionIsNotFound     = errors.New("version is not found")
 	ErrBashProfileAlreadySet = errors.New("bash profile has already been set")
 )
@@ -42,7 +48,7 @@ type FileManagement struct {
 
 func New() (*FileManagement, error) {
 	homePath := os.Getenv(home)
-	storePath := fmt.Sprintf("%s/%s/", homePath, storePath)
+	storePath := fmt.Sprintf("%s/%s", homePath, storePath)
 	if _, err := os.Stat(storePath); os.IsNotExist(err) {
 		if err := os.MkdirAll(storePath, os.ModePerm); err != nil {
 			return nil, err
@@ -133,7 +139,10 @@ func (fm *FileManagement) MoveFiles(useVersion string) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return ErrVersionIsNotFound
 	}
-	command := fmt.Sprintf(unixExtractCommand, filePath)
+	goroot, err := fm.getRootPath()
+	if err != nil {
+		return err
+	}
 	if isWindowOS() {
 		//TODO handle windows OS.
 		/*
@@ -153,10 +162,131 @@ func (fm *FileManagement) MoveFiles(useVersion string) error {
 			Setting environment variables under Windows
 			Under Windows, you may set environment variables through the "Environment Variables" button on the "Advanced" tab of the "System" control panel. Some versions of Windows provide this control panel through the "Advanced System Settings" option inside the "System" control panel.
 		*/
+		tmpFilePath := fmt.Sprintf("%s%s", fm.directoryStorePath, tmpFile)
+		if err := fm.createADirectory(tmpFilePath); err != nil {
+			return err
+		}
+
+		//TODO: find a lib that gonna do tar operation... So we can visualize the progress in stdout
+		command := fmt.Sprintf(extractCommand, tmpFilePath, filePath)
+		commands := strings.Split(command, " ")
+		extractCommand := exec.Command(commands[0], commands[1:]...)
+		if err := extractCommand.Run(); err != nil {
+			return fmt.Errorf("tar command failed %s", err)
+		}
+
+		if err := CopyDir(fmt.Sprintf("%s/go/", tmpFilePath), goroot); err != nil {
+			return fmt.Errorf("CopyDir failed %s", err)
+		}
+
+		if err := fm.removeADirectory(tmpFilePath); err != nil {
+			return fmt.Errorf("removeADirectory failed %s", err)
+		}
 	}
-	commands := strings.Split(command, " ")
-	cmd := exec.Command(commands[0], commands[1:]...)
-	return cmd.Run()
+	//TODO add for other operating systems...
+	return nil
+}
+
+func CopyFile(src, dst string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer func() {
+		if e := out.Close(); e != nil {
+			err = e
+		}
+	}()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return
+	}
+
+	err = out.Sync()
+	if err != nil {
+		return
+	}
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return
+	}
+	err = os.Chmod(dst, si.Mode())
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// CopyDir recursively copies a directory tree, attempting to preserve permissions.
+// Source directory must exist, destination directory must *not* exist.
+// Symlinks are ignored and skipped.
+func CopyDir(src string, dst string) (err error) {
+	src = filepath.Clean(src)
+	dst = filepath.Clean(dst)
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if !si.IsDir() {
+		return fmt.Errorf("source is not a directory")
+	}
+
+	_, err = os.Stat(dst)
+	if err != nil && !os.IsNotExist(err) {
+		return
+	}
+
+	err = os.MkdirAll(dst, si.Mode())
+	if err != nil {
+		return
+	}
+
+	entries, err := ioutil.ReadDir(src)
+	if err != nil {
+		return
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			err = CopyDir(srcPath, dstPath)
+			if err != nil {
+				return
+			}
+		} else {
+			// Skip symlinks.
+			if entry.Mode()&os.ModeSymlink != 0 {
+				continue
+			}
+
+			err = CopyFile(srcPath, dstPath)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+func (fm *FileManagement) createADirectory(directoryPath string) error {
+	return os.MkdirAll(directoryPath, os.ModePerm)
+}
+
+func (fm *FileManagement) removeADirectory(directoryPath string) error {
+	return os.RemoveAll(directoryPath)
 }
 
 func (fm *FileManagement) SetEnvVariable() error {
@@ -181,6 +311,10 @@ func (fm *FileManagement) SetEnvVariable() error {
 	return cmd.Run()
 }
 
-func isWindowOS() bool {
-	return runtime.GOOS == "windows"
+func (fm *FileManagement) getRootPath() (string, error) {
+	if isWindowOS() {
+		return windows.GetGoRoot()
+	}
+
+	return "/usr/local", nil
 }

@@ -3,9 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/olimpias/gvm/internal"
 	"os"
 
-	"github.com/olimpias/gvm/cmd"
 	"github.com/olimpias/gvm/common"
 )
 
@@ -18,7 +18,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
-	var command cmd.Command
+	var command internal.Command
 	//TODO add help
 	switch os.Args[1] {
 	case "dl":
@@ -26,21 +26,21 @@ func main() {
 		if err != nil {
 			terminateWithErr(err)
 		}
-		command = cmd.NewDLCommand(fileManager, ver)
+		command = internal.NewDLCommand(fileManager, ver)
 	case "del":
 		ver, err := getVersionArg()
 		if err != nil {
 			terminateWithErr(err)
 		}
-		command = cmd.NewDelCommand(fileManager, ver)
+		command = internal.NewDelCommand(fileManager, ver)
 	case "use":
 		ver, err := getVersionArg()
 		if err != nil {
 			terminateWithErr(err)
 		}
-		command = cmd.NewUseCommand(fileManager, ver)
+		command = internal.NewUseCommand(fileManager, ver)
 	case "list":
-		command = cmd.NewListCommand(fileManager)
+		command = internal.NewListCommand(fileManager)
 	default:
 		//err
 		fmt.Printf("Unknown command %s \n", os.Args[1])

@@ -1,4 +1,4 @@
-package cmd
+package internal
 
 import (
 	"github.com/olimpias/gvm/common"
@@ -14,15 +14,15 @@ func NewUseCommand(fileManager *common.FileManagement, version string) *UseComma
 }
 
 func (u *UseCommand) Validate() error {
-	return nil
+	return common.ValidateOperation()
 }
 
 func (u *UseCommand) Apply() error {
 	if err := u.fileManager.MoveFiles(u.version); err != nil {
 		return err
 	}
-	if err := u.fileManager.SetEnvVariable(); err != nil {
-		return err
-	}
+	//if err := u.fileManager.SetEnvVariable(); err != nil {
+	//	return err
+	//}
 	return nil
 }

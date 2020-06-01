@@ -1,4 +1,4 @@
-package cmd
+package internal
 
 type Command interface {
 	Validate() error
