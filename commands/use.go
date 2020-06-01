@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/olimpias/gvm/internal/filesystem"
+	"github.com/olimpias/gvm/filesystem"
 )
 
 //go:generate mockgen -source=use.go -destination=mock/user_mock.go -package mock

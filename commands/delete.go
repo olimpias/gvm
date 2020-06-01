@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/olimpias/gvm/internal/filesystem"
+	"github.com/olimpias/gvm/filesystem"
 )
 
 //go:generate mockgen -source=delete.go -destination=mock/deleter_mock.go -package mock

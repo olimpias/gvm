@@ -81,7 +81,7 @@ func (fm *FileManagement) downloadFileWithURL(URL string) (io.ReadCloser, int64,
 func (fm *FileManagement) DownloadGoPackage(version string) error {
 	fileName := getCompressedFileName(version)
 	downloadDirectoryPath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
-	out, err := os.Create(downloadDirectoryPath)
+	out, err := os.OpenFile(downloadDirectoryPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}

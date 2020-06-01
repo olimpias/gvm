@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/olimpias/gvm/internal/commands"
-	"github.com/olimpias/gvm/internal/filesystem"
+	"github.com/olimpias/gvm/commands"
+	"github.com/olimpias/gvm/filesystem"
 )
 
 func main() {
