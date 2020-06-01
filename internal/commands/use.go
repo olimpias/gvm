@@ -4,6 +4,8 @@ import (
 	"github.com/olimpias/gvm/internal/filesystem"
 )
 
+//go:generate mockgen -source=use.go -destination=mock/user_mock.go -package mock
+
 type PackageUser interface {
 	UseGoPackage(version string) error
 }

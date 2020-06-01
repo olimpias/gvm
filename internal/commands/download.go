@@ -2,6 +2,8 @@ package commands
 
 import "github.com/olimpias/gvm/internal/filesystem"
 
+//go:generate mockgen -source=download.go -destination=mock/downloader_mock.go -package mock
+
 type Downloader interface {
 	DownloadGoPackage(version string) error
 }

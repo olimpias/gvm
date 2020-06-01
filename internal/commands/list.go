@@ -2,8 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"github.com/olimpias/gvm/internal/filesystem"
 )
+
+//go:generate mockgen -source=list.go -destination=mock/lister_mock.go -package mock
 
 type Lister interface {
 	ListGoPackageVersions() ([]string, error)
@@ -22,7 +23,7 @@ func (l *ListCommand) Validate() error {
 }
 
 func (l *ListCommand) Apply() error {
-	versions, err := l.fileManager.ListGoPackageVersions()
+	versions, err := l.lister.ListGoPackageVersions()
 	if err != nil {
 		return err
 	}

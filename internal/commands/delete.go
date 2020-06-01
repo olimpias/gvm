@@ -2,6 +2,8 @@ package commands
 
 import "github.com/olimpias/gvm/internal/filesystem"
 
+//go:generate mockgen -source=delete.go -destination=mock/deleter_mock.go -package mock
+
 type Deleter interface {
 	DeleteGoPackage(version string) error
 }
