@@ -11,12 +11,11 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		terminateWithErr(errors.New("show helper"))
+		terminateWithErr(errors.New("No command is set for 'gvm' \n Run 'gvm help' for usage"))
 	}
 	fileManager, err := filesystem.New()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+		terminateWithErr(err)
 	}
 	var command commands.Command
 	//TODO add help
@@ -41,10 +40,10 @@ func main() {
 		command = commands.NewUseCommand(fileManager, ver)
 	case "list":
 		command = commands.NewListCommand(fileManager)
+	case "help":
+		helper()
 	default:
-		//err
-		fmt.Printf("Unknown command %s \n", os.Args[1])
-		os.Exit(2)
+		terminateWithErr(fmt.Errorf("Err: Unknown %s command for 'gvm' \n Run 'gvm help' for usage", os.Args[1]))
 	}
 	if err := command.Validate(); err != nil {
 		terminateWithErr(err)
@@ -63,6 +62,16 @@ func getVersionArg() (string, error) {
 }
 
 func terminateWithErr(err error) {
-	fmt.Println(err)
+	os.Stderr.WriteString(fmt.Sprintf("Err: %s  \n", err))
 	os.Exit(1)
+}
+
+func helper() {
+	os.Stdout.WriteString("gvm is a go version controller\n")
+	os.Stdout.WriteString("Commands:\n")
+	os.Stdout.WriteString("list  list the possible downloaded versions that ready to use.\n")
+	os.Stdout.WriteString("dl    downloads the version that you specify to your machine.\n")
+	os.Stdout.WriteString("use   uses the version that specify as an input. It has to be downloaded first using dl command.\n")
+	os.Stdout.WriteString("del   deletes the version that you specify as an input\n")
+	os.Exit(0)
 }

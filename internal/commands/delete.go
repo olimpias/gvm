@@ -1,6 +1,8 @@
 package commands
 
-import "github.com/olimpias/gvm/internal/filesystem"
+import (
+	"github.com/olimpias/gvm/internal/filesystem"
+)
 
 //go:generate mockgen -source=delete.go -destination=mock/deleter_mock.go -package mock
 
@@ -22,5 +24,5 @@ func (l *DelCommand) Validate() error {
 }
 
 func (l *DelCommand) Apply() error {
-	return l.fileManager.DeleteGoPackage(l.version)
+	return l.deleter.DeleteGoPackage(l.version)
 }

@@ -22,5 +22,5 @@ func (i *DLCommand) Validate() error {
 }
 
 func (i *DLCommand) Apply() error {
-	return i.fileManager.DownloadGoPackage(i.version)
+	return i.downloader.DownloadGoPackage(i.version)
 }
