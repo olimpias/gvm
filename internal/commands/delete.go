@@ -1,20 +1,24 @@
 package commands
 
-import "github.com/olimpias/gvm/common"
+import "github.com/olimpias/gvm/internal/filesystem"
 
-type DelCommand struct {
-	fileManager *common.FileManagement
-	version     string
+type Deleter interface {
+	DeleteGoPackage(version string) error
 }
 
-func NewDelCommand(fileManager *common.FileManagement, version string) *DelCommand {
-	return &DelCommand{fileManager: fileManager, version: version}
+type DelCommand struct {
+	deleter Deleter
+	version string
+}
+
+func NewDelCommand(deleter Deleter, version string) *DelCommand {
+	return &DelCommand{deleter: deleter, version: version}
 }
 
 func (l *DelCommand) Validate() error {
-	return common.ValidateVersion(l.version)
+	return filesystem.ValidateVersion(l.version)
 }
 
 func (l *DelCommand) Apply() error {
-	return l.fileManager.DeleteFile(l.version)
+	return l.fileManager.DeleteGoPackage(l.version)
 }

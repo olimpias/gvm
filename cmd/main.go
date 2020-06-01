@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/olimpias/gvm/common"
 	"github.com/olimpias/gvm/internal/commands"
+	"github.com/olimpias/gvm/internal/filesystem"
 )
 
 func main() {
 	if len(os.Args) < 2 {
 		terminateWithErr(errors.New("show helper"))
 	}
-	fileManager, err := common.New()
+	fileManager, err := filesystem.New()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(2)

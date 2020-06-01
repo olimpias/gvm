@@ -1,28 +1,26 @@
 package commands
 
 import (
-	"github.com/olimpias/gvm/common"
+	"github.com/olimpias/gvm/internal/filesystem"
 )
 
+type PackageUser interface {
+	UseGoPackage(version string) error
+}
+
 type UseCommand struct {
-	fileManager *common.FileManagement
+	packageUser PackageUser
 	version     string
 }
 
-func NewUseCommand(fileManager *common.FileManagement, version string) *UseCommand {
-	return &UseCommand{fileManager: fileManager, version: version}
+func NewUseCommand(fileManager PackageUser, version string) *UseCommand {
+	return &UseCommand{packageUser: fileManager, version: version}
 }
 
 func (u *UseCommand) Validate() error {
-	return common.ValidateOperation()
+	return filesystem.ValidateOperation()
 }
 
 func (u *UseCommand) Apply() error {
-	if err := u.fileManager.MoveFiles(u.version); err != nil {
-		return err
-	}
-	//if err := u.fileManager.SetEnvVariable(); err != nil {
-	//	return err
-	//}
-	return nil
+	return u.packageUser.UseGoPackage(u.version)
 }

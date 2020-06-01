@@ -1,20 +1,24 @@
 package commands
 
-import "github.com/olimpias/gvm/common"
+import "github.com/olimpias/gvm/internal/filesystem"
 
-type DLCommand struct {
-	version     string
-	fileManager *common.FileManagement
+type Downloader interface {
+	DownloadGoPackage(version string) error
 }
 
-func NewDLCommand(fileManager *common.FileManagement, version string) *DLCommand {
-	return &DLCommand{fileManager: fileManager, version: version}
+type DLCommand struct {
+	version    string
+	downloader Downloader
+}
+
+func NewDLCommand(downloader Downloader, version string) *DLCommand {
+	return &DLCommand{downloader: downloader, version: version}
 }
 
 func (i *DLCommand) Validate() error {
-	return common.ValidateVersion(i.version)
+	return filesystem.ValidateVersion(i.version)
 }
 
 func (i *DLCommand) Apply() error {
-	return i.fileManager.DownloadFileWithProgress(i.version)
+	return i.fileManager.DownloadGoPackage(i.version)
 }

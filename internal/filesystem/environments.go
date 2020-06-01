@@ -1,4 +1,4 @@
-package common
+package filesystem
 
 import (
 	"errors"
@@ -10,13 +10,13 @@ const (
 )
 
 var (
-	PathNotFound = errors.New("Path is not found")
+	ErrGORootIsNotFound = errors.New("$GOROOT is not found in environmental variables")
 )
 
 func getGORoot() (string, error) {
 	goPath := os.Getenv(GORooT)
 	if goPath == "" {
-		return "", PathNotFound
+		return "", ErrGORootIsNotFound
 	}
 	return goPath, nil
 }

@@ -2,15 +2,19 @@ package commands
 
 import (
 	"fmt"
-	"github.com/olimpias/gvm/common"
+	"github.com/olimpias/gvm/internal/filesystem"
 )
 
-type ListCommand struct {
-	fileManager *common.FileManagement
+type Lister interface {
+	ListGoPackageVersions() ([]string, error)
 }
 
-func NewListCommand(fileManager *common.FileManagement) *ListCommand {
-	return &ListCommand{fileManager: fileManager}
+type ListCommand struct {
+	lister Lister
+}
+
+func NewListCommand(lister Lister) *ListCommand {
+	return &ListCommand{lister: lister}
 }
 
 func (l *ListCommand) Validate() error {
@@ -18,7 +22,7 @@ func (l *ListCommand) Validate() error {
 }
 
 func (l *ListCommand) Apply() error {
-	versions, err := l.fileManager.ListVersions()
+	versions, err := l.fileManager.ListGoPackageVersions()
 	if err != nil {
 		return err
 	}
