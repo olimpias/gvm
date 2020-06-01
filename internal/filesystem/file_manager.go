@@ -44,15 +44,24 @@ type FileManagement struct {
 	archName           string
 }
 
+type mockOSOperation interface {
+	deleteFile(folderPath string) error
+	validateFileExistence(filePath string) error
+	createDirectory(directoryPath string) error
+	removeDirectory(directoryPath string) error
+	executeCommands(name string, args ...string) error
+}
+
 func New() (*FileManagement, error) {
 	homePath := os.Getenv(home)
 	storePath := fmt.Sprintf("%s/%s", homePath, storePath)
-	if _, err := os.Stat(storePath); os.IsNotExist(err) {
-		if err := os.MkdirAll(storePath, os.ModePerm); err != nil {
+	fm := &FileManagement{directoryStorePath: storePath, osName: runtime.GOOS, archName: runtime.GOARCH}
+	if err := fm.validateFileExistence(storePath); err != nil {
+		if err := fm.createDirectory(storePath); err != nil {
 			return nil, err
 		}
 	}
-	return &FileManagement{directoryStorePath: storePath, osName: runtime.GOOS, archName: runtime.GOARCH}, nil
+	return fm, nil
 }
 
 func (fm *FileManagement) downloadFileWithURL(URL string) (io.ReadCloser, int64, error) {
@@ -152,7 +161,7 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 	}
 
 	tmpFilePath := fmt.Sprintf("%s%s", fm.directoryStorePath, tmpFile)
-	if err := fm.createADirectory(tmpFilePath); err != nil {
+	if err := fm.createDirectory(tmpFilePath); err != nil {
 		return err
 	}
 
@@ -266,7 +275,7 @@ func (fm *FileManagement) copyDirectory(src string, dst string) error {
 	return nil
 }
 
-func (fm *FileManagement) createADirectory(directoryPath string) error {
+func (fm *FileManagement) createDirectory(directoryPath string) error {
 	return os.MkdirAll(directoryPath, os.ModePerm)
 }
 
