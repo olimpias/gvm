@@ -1,4 +1,4 @@
-package internal
+package commands
 
 import (
 	"github.com/olimpias/gvm/common"

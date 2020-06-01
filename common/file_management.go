@@ -3,7 +3,6 @@ package common
 import (
 	"errors"
 	"fmt"
-	"github.com/olimpias/gvm/windows"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -139,49 +138,45 @@ func (fm *FileManagement) MoveFiles(useVersion string) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return ErrVersionIsNotFound
 	}
-	goroot, err := fm.getRootPath()
+	goroot, err := getGORoot()
 	if err != nil {
 		return err
 	}
-	if isWindowOS() {
-		//TODO handle windows OS.
-		/*
-			Windows
-			The Go project provides two installation options for Windows users (besides installing from source): a zip archive that requires you to set some environment variables and an MSI installer that configures your installation automatically.
+	/*
+		Windows
+		The Go project provides two installation options for Windows users (besides installing from source): a zip archive that requires you to set some environment variables and an MSI installer that configures your installation automatically.
 
-			MSI installer
-			Open the MSI file and follow the prompts to install the Go tools. By default, the installer puts the Go distribution in c:\Go.
+		MSI installer
+		Open the MSI file and follow the prompts to install the Go tools. By default, the installer puts the Go distribution in c:\Go.
 
-			The installer should put the c:\Go\bin directory in your PATH environment variable. You may need to restart any open command prompts for the change to take effect.
+		The installer should put the c:\Go\bin directory in your PATH environment variable. You may need to restart any open command prompts for the change to take effect.
 
-			Zip archive
-			Download the zip file and extract it into the directory of your choice (we suggest c:\Go).
+		Zip archive
+		Download the zip file and extract it into the directory of your choice (we suggest c:\Go).
 
-			Add the bin subdirectory of your Go root (for example, c:\Go\bin) to your PATH environment variable.
+		Add the bin subdirectory of your Go root (for example, c:\Go\bin) to your PATH environment variable.
 
-			Setting environment variables under Windows
-			Under Windows, you may set environment variables through the "Environment Variables" button on the "Advanced" tab of the "System" control panel. Some versions of Windows provide this control panel through the "Advanced System Settings" option inside the "System" control panel.
-		*/
-		tmpFilePath := fmt.Sprintf("%s%s", fm.directoryStorePath, tmpFile)
-		if err := fm.createADirectory(tmpFilePath); err != nil {
-			return err
-		}
+		Setting environment variables under Windows
+		Under Windows, you may set environment variables through the "Environment Variables" button on the "Advanced" tab of the "System" control panel. Some versions of Windows provide this control panel through the "Advanced System Settings" option inside the "System" control panel.
+	*/
+	tmpFilePath := fmt.Sprintf("%s%s", fm.directoryStorePath, tmpFile)
+	if err := fm.createADirectory(tmpFilePath); err != nil {
+		return err
+	}
+	//TODO: find a lib that gonna do tar operation... So we can visualize the progress in stdout
+	command := fmt.Sprintf(extractCommand, tmpFilePath, filePath)
+	commands := strings.Split(command, " ")
+	extractCommand := exec.Command(commands[0], commands[1:]...)
+	if err := extractCommand.Run(); err != nil {
+		return fmt.Errorf("tar command failed %s", err)
+	}
 
-		//TODO: find a lib that gonna do tar operation... So we can visualize the progress in stdout
-		command := fmt.Sprintf(extractCommand, tmpFilePath, filePath)
-		commands := strings.Split(command, " ")
-		extractCommand := exec.Command(commands[0], commands[1:]...)
-		if err := extractCommand.Run(); err != nil {
-			return fmt.Errorf("tar command failed %s", err)
-		}
+	if err := CopyDir(fmt.Sprintf("%s/go/", tmpFilePath), goroot); err != nil {
+		return fmt.Errorf("CopyDir failed %s", err)
+	}
 
-		if err := CopyDir(fmt.Sprintf("%s/go/", tmpFilePath), goroot); err != nil {
-			return fmt.Errorf("CopyDir failed %s", err)
-		}
-
-		if err := fm.removeADirectory(tmpFilePath); err != nil {
-			return fmt.Errorf("removeADirectory failed %s", err)
-		}
+	if err := fm.removeADirectory(tmpFilePath); err != nil {
+		return fmt.Errorf("removeADirectory failed %s", err)
 	}
 	//TODO add for other operating systems...
 	return nil
@@ -213,16 +208,6 @@ func CopyFile(src, dst string) (err error) {
 	if err != nil {
 		return
 	}
-
-	si, err := os.Stat(src)
-	if err != nil {
-		return
-	}
-	err = os.Chmod(dst, si.Mode())
-	if err != nil {
-		return
-	}
-
 	return
 }
 
@@ -309,12 +294,4 @@ func (fm *FileManagement) SetEnvVariable() error {
 	}
 	cmd := exec.Command(unixBashSourceCmd, bashProfilePath)
 	return cmd.Run()
-}
-
-func (fm *FileManagement) getRootPath() (string, error) {
-	if isWindowOS() {
-		return windows.GetGoRoot()
-	}
-
-	return "/usr/local", nil
 }

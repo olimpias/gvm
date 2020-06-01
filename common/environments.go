@@ -1,4 +1,4 @@
-package windows
+package common
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ var (
 
 //TODO: add zip existence check here
 
-func GetGoRoot() (string, error) {
+func getGORoot() (string, error) {
 	goPath := os.Getenv(GORooT)
 	if goPath == "" {
 		return "", PathNotFound
