@@ -13,8 +13,6 @@ var (
 	PathNotFound = errors.New("Path is not found")
 )
 
-//TODO: add zip existence check here
-
 func getGORoot() (string, error) {
 	goPath := os.Getenv(GORooT)
 	if goPath == "" {
