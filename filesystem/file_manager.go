@@ -134,8 +134,8 @@ func (fm *FileManagement) ListGoPackageVersions() ([]string, error) {
 }
 
 func (fm *FileManagement) iterateOverPackages(goVersionFileInfos []os.FileInfo) []string {
-	versionNames := make([]string, len(goVersionFileInfos))
-	for i, file := range goVersionFileInfos {
+	versionNames := make([]string, 0, len(goVersionFileInfos))
+	for _, file := range goVersionFileInfos {
 		fileExtraction := fmt.Sprintf(downloadFileOSArch, runtime.GOOS, runtime.GOARCH)
 		if isWindowOS() {
 			fileExtraction = fmt.Sprintf(downloadFileOSArchW, runtime.GOOS, runtime.GOARCH)
@@ -144,7 +144,7 @@ func (fm *FileManagement) iterateOverPackages(goVersionFileInfos []os.FileInfo) 
 			continue
 		}
 		fileName := file.Name()
-		versionNames[i] = fileName[:len(fileName)-len(fileExtraction)]
+		versionNames = append(versionNames, fileName[:len(fileName)-len(fileExtraction)])
 	}
 	return versionNames
 }
@@ -242,8 +242,10 @@ func (fm *FileManagement) copyFile(src, dst string) error {
 		return err
 	}
 
-	if err := out.Chmod(0755); err != nil {
-		return err
+	if !isWindowOS() {
+		if err := out.Chmod(0755); err != nil {
+			return err
+		}
 	}
 
 	return out.Sync()
