@@ -4,5 +4,5 @@ go 1.13
 
 require (
 	github.com/cheggaaa/pb/v3 v3.0.2
-	github.com/golang/mock v1.4.3 // indirect
+	github.com/golang/mock v1.4.3
 )

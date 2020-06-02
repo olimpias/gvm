@@ -49,7 +49,8 @@ type mockOSOperation interface {
 	validateFileExistence(filePath string) error
 	createDirectory(directoryPath string) error
 	removeDirectory(directoryPath string) error
-	executeCommands(name string, args ...string) error
+	executeCommands(name string, args []string) error
+	removeDirectoryContents(path string) error
 }
 
 func New() (*FileManagement, error) {
@@ -168,8 +169,12 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 	//TODO: find a lib that gonna do tar operation... So we can visualize the progress in stdout
 	command := fmt.Sprintf(extractCommand, tmpFilePath, filePath)
 	commands := strings.Split(command, " ")
-	if err := fm.executeCommands(commands[0], commands[1:]...); err != nil {
+	if err := fm.executeCommands(commands[0], commands[1:]); err != nil {
 		return fmt.Errorf("tar command execution failed. Err: %s", err)
+	}
+
+	if err := fm.removeDirectoryContents(fmt.Sprintf("%s/", goroot)); err != nil {
+		return fmt.Errorf("removing files and directories in goroot folder failed. Err: %s. The goroot path %s", err, goroot)
 	}
 
 	if err := fm.copyDirectory(fmt.Sprintf("%s/go/", tmpFilePath), goroot); err != nil {
@@ -190,12 +195,32 @@ func (fm *FileManagement) validateFileExistence(filePath string) error {
 	return nil
 }
 
-func (fm *FileManagement) executeCommands(name string, args ...string) error {
-	extractCommand := exec.Command(name, args[1:]...)
+func (fm *FileManagement) executeCommands(name string, args []string) error {
+	extractCommand := exec.Command(name, args...)
 	if err := extractCommand.Run(); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (fm *FileManagement) removeDirectoryContents(path string) error {
+	d, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	//Return all directories
+	names, err := d.Readdirnames(0)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(path, name))
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -217,11 +242,11 @@ func (fm *FileManagement) copyFile(src, dst string) error {
 		return err
 	}
 
-	err = out.Sync()
-	if err != nil {
+	if err := out.Chmod(0755); err != nil {
 		return err
 	}
-	return nil
+
+	return out.Sync()
 }
 
 func (fm *FileManagement) copyDirectory(src string, dst string) error {
