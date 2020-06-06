@@ -20,7 +20,12 @@ func NewUseCommand(fileManager PackageUser, version string) *UseCommand {
 }
 
 func (u *UseCommand) Validate() error {
-	return filesystem.ValidateOperation()
+	err := filesystem.ValidateOperation()
+	if err != nil {
+		return err
+	}
+
+	return filesystem.ValidateVersion(u.version)
 }
 
 func (u *UseCommand) Apply() error {
