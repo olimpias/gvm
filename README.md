@@ -7,7 +7,13 @@ set in environmental variables. In addition to that, the user privileges must be
 be permission issues to change and replace folders.
 
 ## Installation
-It is going to be fill in... in progress
+
+Download release version from [releases](https://github.com/olimpias/gvm/releases) according to your operating system. For now, releases are done for OSX and windows 64.
+
+Extract the executable from tar/zip. Then enjoy it!
+
+**Note:** If you are trying to install go with this file, you have to set bash configuration by yourself. Also, **gvm** requires `GOROOT` environmental variable.
+
 
 ## Command Usages
 gvm provides 5 type of commands that you can apply; `help`, `list`, `use`, `download` and `del`
