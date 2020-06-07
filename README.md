@@ -6,14 +6,13 @@ Supports OSx, linux and windows. It requires to preinstalled go(for now...) and 
 set in environmental variables. In addition to that, the user privileges must be set to run the program. Otherwise, there will
 be permission issues to change and replace folders.
 
-##Installation
-
+## Installation
 It is going to be fill in... in progress
 
-##Command Usages
+## Command Usages
 gvm provides 5 type of commands that you can apply; `help`, `list`, `use`, `download` and `del`
 
-###List Command
+### List Command
 Lists the possible go versions that you have downloaded to your local machine. To download a specific version checkout [Download Command](#download-command)
 
 Command usage: `gvm list`
@@ -29,7 +28,8 @@ go1.13.8
 go1.14.2
 go1.14.3
 ```
-###Download Command
+
+### Download Command
 Downloads the version that you inputted the command. It downloads tar file into your `$HOME/.gvm` path.
 
 `gvm dl <go-version>`
@@ -42,7 +42,7 @@ Example Usage:
 118.43 MiB / 118.43 MiB [-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------] 100.00% 23.81 MiB p/s 5s
 ```
 
-###Use Command
+### Use Command
 Sets go version that you inputted into the command. It unzip the downloaded file and moves files into your `GOROOT` path. It may take sometime. In future versions, progressbar is going to be added.
 To able to use a go version, you need to download it before using `gvm dl <go-version>` [Download Command](#download-command)
 
@@ -52,14 +52,12 @@ Example Usage:
 
 `gvm use 1.11.1`
 
-###Del Command
-
+### Del Command
 Deletes the version of go file that you inputted as a version from your `$HOME/.gvm`.
 
 Command usage:`gvm del <go-version>`
 
-
-###Help Command
+### Help Command
 To print help
 
 Command usage: `gvm help`
