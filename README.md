@@ -14,7 +14,7 @@ Extract the executable from tar/zip. Then enjoy it!
 
 **Note:** If you are trying to install go with this file, you have to set bash configuration by yourself. Also, **gvm** requires `GOROOT` environmental variable.
 
-Checkout example for [setting up environment](#setting-up-env-for-v0.0.1-from-scratch-in-macOS)
+Checkout example for [setting up environment](#setting-up-env-for-v001-from-scratch-in-macos)
 
 ## Command Usages
 gvm provides 5 type of commands that you can apply; `help`, `list`, `use`, `download` and `del`
