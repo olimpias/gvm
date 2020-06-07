@@ -14,6 +14,7 @@ Extract the executable from tar/zip. Then enjoy it!
 
 **Note:** If you are trying to install go with this file, you have to set bash configuration by yourself. Also, **gvm** requires `GOROOT` environmental variable.
 
+Checkout example for [setting up environment](#setting-up-env-for-v0.0.1-from-scratch-in-macOS)
 
 ## Command Usages
 gvm provides 5 type of commands that you can apply; `help`, `list`, `use`, `download` and `del`
@@ -76,6 +77,28 @@ dl    downloads the version that you specify to your machine.
 use   uses the version that specify as an input. It has to be downloaded first using dl command.
 del   deletes the version that you specify as an input
 ```
+
+## Setting Up Env For v0.0.1 From Scratch in MacOS
+
+Be sure if go is installed. Otherwise it is hardly recommended to install for alpha version.
+
+Then, check if `goroot` is set with  `echo $GOROOT`.
+
+If it returns empty try using `which go`, this will return go path.
+
+Set env with `export GOROOT=PATH`(put result from `which go` command, you should exclude /bin/go in path). For default installation it is most likely `/usr/local/go`. It is recommanded to add it to bash profile
+otherwise you need to set `GOROOT` into environmental variable all the time to use **gvm**.
+Example result `/usr/local/go/bin/go`, you need to use `/usr/local/go` as `GOROOT`.
+
+Check the permission for users. Most likely for default installation it is assigned to root user and your current user does not have access for that directory to edit.
+
+Go to `cd $GOROOT/..` path and use `sudo chmod -R 777 go` or `sudo chmod -R 755 go`.
+
+Click [link](https://github.com/olimpias/gvm/releases/download/v0.0.1/gvm_0.0.1.darwin-amd64.tar.gz) to download tar file.
+
+Use `tar xvf gvm_0.0.1.darwin-amd64.tar.gz` to extract tar file and it will extract `gvm` executable. It is ready for use
+
+You need to use it with `./` at the beginning. Example: `./gvm dl 1.14.4`
 
 ## TODOs
 * Add progressbar for unzipping
