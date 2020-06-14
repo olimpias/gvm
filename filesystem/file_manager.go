@@ -1,16 +1,18 @@
 package filesystem
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -30,8 +32,6 @@ const (
 	unixBashSourceCmd = "source"
 	unixBashProfile   = ".bash_profile"
 	unixExportPath    = "export PATH=$PATH:/usr/local/go/bin"
-
-	extractCommand = "tar -C %s -zxvf %s"
 )
 
 var (
@@ -166,11 +166,9 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 		return err
 	}
 
-	//TODO: find a lib that gonna do tar operation... So we can visualize the progress in stdout
-	command := fmt.Sprintf(extractCommand, tmpFilePath, filePath)
-	commands := strings.Split(command, " ")
-	if err := fm.executeCommands(commands[0], commands[1:]); err != nil {
-		return fmt.Errorf("tar command execution failed. Err: %s", err)
+	//TODO: add progress bar
+	if err := fm.unzipFile(filePath, tmpFilePath); err != nil {
+		return fmt.Errorf("failed to unzip file. Err: %s", err)
 	}
 
 	if err := fm.removeDirectoryContents(fmt.Sprintf("%s/", goroot)); err != nil {
@@ -183,6 +181,51 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 
 	if err := fm.removeDirectory(tmpFilePath); err != nil {
 		return fmt.Errorf("removing temperory folder failed. Err: %s. The tmp path %s", err, tmpFilePath)
+	}
+
+	return nil
+}
+
+func (fm *FileManagement) unzipFile(srcPath, destPath string) error {
+	zipFile, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer zipFile.Close()
+	uncompressedStream, err := gzip.NewReader(zipFile)
+	if err != nil {
+		return err
+	}
+	defer uncompressedStream.Close()
+	tarReader := tar.NewReader(uncompressedStream)
+
+	for true {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+		fPath := filepath.Join(destPath, header.Name)
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if err := os.Mkdir(fPath, 0755); err != nil {
+				log.Fatalf("ExtractTarGz: Mkdir() failed: %s", err.Error())
+			}
+		case tar.TypeReg:
+			outFile, err := os.Create(fPath)
+			if err != nil {
+				log.Fatalf("ExtractTarGz: Create() failed: %s", err.Error())
+			}
+			defer outFile.Close()
+			if _, err := io.Copy(outFile, tarReader); err != nil {
+				log.Fatalf("ExtractTarGz: Copy() failed: %s", err.Error())
+			}
+		default:
+			return fmt.Errorf("unknow type: %s in %s", header.Typeflag, header.Name)
+		}
 	}
 
 	return nil
