@@ -2,17 +2,18 @@ package filesystem
 
 import (
 	"archive/tar"
+	"archive/zip"
 	"compress/gzip"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/cheggaaa/pb/v3"
 )
@@ -167,7 +168,7 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 	}
 
 	//TODO: add progress bar
-	if err := fm.unzipFile(filePath, tmpFilePath); err != nil {
+	if err := fm.extractCompressedFile(filePath, tmpFilePath); err != nil {
 		return fmt.Errorf("failed to unzip file. Err: %s", err)
 	}
 
@@ -186,7 +187,72 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 	return nil
 }
 
+func (fm *FileManagement) extractCompressedFile(srcPath, destPath string) error {
+	if strings.HasSuffix(srcPath, ".zip") {
+		return fm.unzipFile(srcPath, destPath)
+	}
+
+	return fm.unTarFile(srcPath, destPath)
+}
+
 func (fm *FileManagement) unzipFile(srcPath, destPath string) error {
+	reader, err := zip.OpenReader(srcPath)
+	if err != nil {
+		return err
+	}
+	defer reader.Close()
+
+	if err := os.MkdirAll(destPath, os.ModePerm); err != nil {
+		return err
+	}
+	// Closure to address file descriptors issue with all the deferred .Close() methods
+	extractAndWriteFile := func(f *zip.File) error {
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err := rc.Close(); err != nil {
+				panic(err)
+			}
+		}()
+
+		path := filepath.Join(destPath, f.Name)
+
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(path, f.Mode()); err != nil {
+				return err
+			}
+		} else {
+			if err := os.MkdirAll(filepath.Dir(path), f.Mode()); err != nil {
+				return err
+			}
+
+			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+
+			_, err = io.Copy(f, rc)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, f := range reader.File {
+		err := extractAndWriteFile(f)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (fm *FileManagement) unTarFile(srcPath, destPath string) error {
 	zipFile, err := os.Open(srcPath)
 	if err != nil {
 		return err
@@ -198,13 +264,11 @@ func (fm *FileManagement) unzipFile(srcPath, destPath string) error {
 	}
 	defer uncompressedStream.Close()
 	tarReader := tar.NewReader(uncompressedStream)
-
-	for true {
+	for {
 		header, err := tarReader.Next()
 		if err == io.EOF {
 			break
 		}
-
 		if err != nil {
 			return err
 		}
@@ -212,16 +276,16 @@ func (fm *FileManagement) unzipFile(srcPath, destPath string) error {
 		switch header.Typeflag {
 		case tar.TypeDir:
 			if err := os.Mkdir(fPath, 0755); err != nil {
-				log.Fatalf("ExtractTarGz: Mkdir() failed: %s", err.Error())
+				return err
 			}
 		case tar.TypeReg:
 			outFile, err := os.Create(fPath)
 			if err != nil {
-				log.Fatalf("ExtractTarGz: Create() failed: %s", err.Error())
+				return err
 			}
 			defer outFile.Close()
 			if _, err := io.Copy(outFile, tarReader); err != nil {
-				log.Fatalf("ExtractTarGz: Copy() failed: %s", err.Error())
+				return err
 			}
 		default:
 			return fmt.Errorf("unknow type: %s in %s", header.Typeflag, header.Name)
