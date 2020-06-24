@@ -39,6 +39,17 @@ jobs:
             go version
             [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
+  integration-test-windows:
+    machine:
+      image: windows-default # Windows machine image
+    resource_class: windows.medium
+    steps:
+      # Commands are run in a Windows virtual machine environment
+      - checkout
+      - run: echo $GOROOT
+      - run: go version
+      - run: Write-Host 'Hello, Windows'
+
 workflows:
   version: 2
   all:
