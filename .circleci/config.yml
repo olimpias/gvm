@@ -1,7 +1,4 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
 
 linuxGoEnv1_14: &linuxGoEnv1_14
   docker:
@@ -40,9 +37,10 @@ jobs:
             [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
   integration-test-windows:
-    machine:
-      image: windows-default # Windows machine image
-    resource_class: windows.medium
+    orbs:
+      win: circleci/windows@2.2.0
+    executor:
+      name: win/default
     steps:
       # Commands are run in a Windows virtual machine environment
       - checkout
