@@ -50,7 +50,7 @@ jobs:
       - checkout
       - run: echo $GOROOT
       - run: go version
-      - run: Write-Host 'Hello, Windows'
+      - run: where go
 
 workflows:
   version: 2
