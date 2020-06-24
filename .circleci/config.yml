@@ -1,7 +1,4 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.0
 
 linuxGoEnv1_14: &linuxGoEnv1_14
   docker:
@@ -39,10 +36,30 @@ jobs:
             go version
             [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
+  integration-test-windows:
+    machine:
+      image: windows-server-2019-vs2019:stable
+    shell: bash.exe
+    environment:
+      GOROOT: C:\Go
+    resource_class: windows.medium
+    working_directory: C:\github.com\olimpias\gvm
+    steps:
+      # Commands are run in a Windows virtual machine environment
+      - checkout
+      - run:
+          command: |
+            go build -o gvm ./cmd
+            ./gvm dl 1.14.4
+            ./gvm use 1.14.4
+            go version
+            [[ $(go version) == "go version go1.14.4 windows/amd64" ]] && exit 0 || exit 1
+
 workflows:
   version: 2
   all:
     jobs:
       - unit-tests
       - integration-test-linux
+      - integration-test-windows
 
