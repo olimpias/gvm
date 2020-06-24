@@ -106,6 +106,6 @@ You need to use it with `./` at the beginning. Example: `./gvm dl 1.14.4`
 
 ## TODOs
 - [X] Add progressbar for unzipping
-- [ ] Add CI/CD for testing windows and linux over circleci
+- [X] Add CI/CD for testing windows and linux over circleci
 - [ ] Add executable as a downloadable so that it could be usable through homebrew or other example platforms.
 - [ ] Provide initial installation of go(without preinstalled go) with executable file.
