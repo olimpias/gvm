@@ -1,4 +1,4 @@
-version: 2.1
+version: 2.0
 
 linuxGoEnv1_14: &linuxGoEnv1_14
   docker:
@@ -13,6 +13,10 @@ linuxGoEnv1_10: &linuxGoEnv1_10
   environment:
     GOROOT: /usr/local/go
   working_directory: /go/src/github.com/olimpias/gvm
+
+windowsGoEnv1_10: &windowsGoEnv1_10
+  docker:
+    - image: winamd64/golang:1.10
 
 jobs:
   unit-tests:
@@ -37,10 +41,7 @@ jobs:
             [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
   integration-test-windows:
-    orbs:
-      win: circleci/windows@2.2.0
-    executor:
-      name: win/default
+    <<: *windowsGoEnv1_10
     steps:
       # Commands are run in a Windows virtual machine environment
       - checkout
