@@ -34,9 +34,8 @@ jobs:
         - run: go build -o gvm ./cmd
         - run: ./gvm dl 1.14.4
         - run: ./gvm use 1.14.4
-        - run: var=$(go version)
-        - run: echo $var
-        - run: '[[ $var == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1'
+        - run: go version
+        - run: '[[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1'
 
 workflows:
   version: 2
