@@ -241,8 +241,18 @@ func (fm *FileManagement) unzipFile(srcPath, destPath string) error {
 		return nil
 	}
 
+	totalSize := int64(0)
 	for _, f := range reader.File {
+		totalSize += int64(f.UncompressedSize64)
+	}
+
+	bar := pb.Full.Start64(totalSize)
+	currentProgress := int64(0)
+	defer bar.Finish()
+	for _, f := range reader.File {
+		currentProgress += int64(f.UncompressedSize64)
 		err := extractAndWriteFile(f)
+		bar.SetCurrent(currentProgress)
 		if err != nil {
 			return err
 		}
