@@ -104,6 +104,11 @@ Use `tar xvf gvm_0.0.1.darwin-amd64.tar.gz` to extract tar file and it will extr
 
 You need to use it with `./` at the beginning. Example: `./gvm dl 1.14.4`
 
+For instance, if you want to install go `1.14.4`,
+
+First you need to run `./gvm dl 1.14.4` to download its tar.gz file.
+After that you need to run `./gvm use 1.14.4`. Once you run this command, it will replace existing go version with `1.14.4`.
+
 ## TODOs
 - [X] Add progressbar for unzipping
 - [X] Add CI/CD for testing windows and linux over circleci
