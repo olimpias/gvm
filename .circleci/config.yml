@@ -44,6 +44,8 @@ jobs:
     machine:
       image: windows-server-2019-vs2019:stable
     shell: bash.exe
+    environment:
+      GOROOT: C:\Go
     resource_class: windows.medium
     steps:
       # Commands are run in a Windows virtual machine environment
