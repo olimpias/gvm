@@ -16,7 +16,7 @@ linuxGoEnv1_10: &linuxGoEnv1_10
 
 windowsGoEnv1_10: &windowsGoEnv1_10
   docker:
-    - image: winamd64/golang:1.10
+    - image: winamd64/golang:1.10-windowsservercore
 
 jobs:
   unit-tests:
