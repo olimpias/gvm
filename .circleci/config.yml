@@ -2,25 +2,45 @@
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
-jobs:
-  build:
+
+linuxGoEnv1_14: &linuxGoEnv1_14
+  docker:
+    - image: golang:1.14
+  environment:
+    GOROOT: /usr/local/go
+  working_directory: /go/src/github.com/olimpias/gvm
+
+linuxGoEnv1_10: &linuxGoEnv1_10
     docker:
-      # specify the version
-      - image: circleci/golang:1.14
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
+      - image: golang:1.10
+    environment:
+      GOROOT: /usr/local/go
     working_directory: /go/src/github.com/olimpias/gvm
-    steps:
-      - checkout
 
-      # specify any bash command here prefixed with `run: `
-      - run: go get -v -t -d ./...
-      - run: go test -v ./...
+jobs:
+    unit-tests:
+      <<: *linuxGoEnv1_14
+      steps:
+        - checkout
+        # specify any bash command here prefixed with `run: `
+        - run: go get -v -t -d ./...
+        - run: go test -v ./...
+
+    integration-test-linux:
+      <<: *linuxGoEnv1_10
+      steps:
+        - checkout
+        - run: go get ./...
+        - run: go build -o gvm ./cmd
+        - run: ./gvm dl 1.14.4
+        - run: ./gvm use 1.14.4
+        - run: go version
+        - run: '[[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1'
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - unit-tests
+      - integration-test-linux
+
