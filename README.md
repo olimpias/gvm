@@ -6,13 +6,13 @@
 gvm is a short version of `Go Version Manager`. It allows you to manage your installed go version and change its versions
 according to your requirements. 
 
-Supports OSx, linux and windows. It requires to preinstalled go(for now...) and `GOPATH` to be
+Supports macOS, linux and windows. It requires to preinstalled go(for now...) and `GOPATH` to be
 set in environmental variables. In addition to that, the user privileges must be set to run the program. Otherwise, there will
 be permission issues to change and replace folders.
 
 ## Installation
 
-Download release version from [releases](https://github.com/olimpias/gvm/releases) according to your operating system. For now, releases are done for OSX and windows 64.
+Download release version from [releases](https://github.com/olimpias/gvm/releases) according to your operating system. For now, releases are done for macOS and windows 64 bit.
 
 Extract the executable from tar/zip. Then enjoy it!
 
