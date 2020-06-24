@@ -8,9 +8,9 @@ linuxGoEnv1_14: &linuxGoEnv1_14
     - image: golang:1.14
   working_directory: /go/src/github.com/olimpias/gvm
 
-linuxGoEnv1_11: &linuxGoEnv1_11
+linuxGoEnv1_10: &linuxGoEnv1_10
     docker:
-      - image: golang:1.11
+      - image: golang:1.10
     working_directory: /go/src/github.com/olimpias/gvm
 
 jobs:
@@ -23,9 +23,10 @@ jobs:
         - run: go test -v ./...
 
     integration-test-linux:
-      <<: *linuxGoEnv1_11
+      <<: *linuxGoEnv1_10
       steps:
         - checkout
+        - run: go get ./...
         - run: go build -o gvm ./cmd
         - run: export GOROOT=/usr/local/go
         - run: ./gvm dl 1.14.4
