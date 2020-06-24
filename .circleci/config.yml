@@ -6,11 +6,15 @@ version: 2
 linuxGoEnv1_14: &linuxGoEnv1_14
   docker:
     - image: golang:1.14
+  environment:
+    GOROOT: /usr/local/go
   working_directory: /go/src/github.com/olimpias/gvm
 
 linuxGoEnv1_10: &linuxGoEnv1_10
     docker:
       - image: golang:1.10
+    environment:
+      GOROOT: /usr/local/go
     working_directory: /go/src/github.com/olimpias/gvm
 
 jobs:
@@ -28,7 +32,6 @@ jobs:
         - checkout
         - run: go get ./...
         - run: go build -o gvm ./cmd
-        - run: export GOROOT=/usr/local/go
         - run: ./gvm dl 1.14.4
         - run: ./gvm use 1.14.4
         - run: var=$(go version)
