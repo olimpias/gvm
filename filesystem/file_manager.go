@@ -346,7 +346,7 @@ func (fm *FileManagement) moveFilesToDestForTarType(reader io.Reader, totalSize 
 				}
 			}
 		default:
-			return fmt.Errorf("unknow type: %s in %s", header.Typeflag, header.Name)
+			return fmt.Errorf("unknow type: %d in %s", header.Typeflag, header.Name)
 		}
 	}
 
