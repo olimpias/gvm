@@ -41,10 +41,9 @@ jobs:
             [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
   integration-test-windows:
-    build:
-      machine:
-        image: winamd64/golang:1.10-windowsservercore
-      resource_class: windows.medium
+    machine:
+      image: winamd64/golang:1.10-windowsservercore
+    resource_class: windows.medium
     steps:
       # Commands are run in a Windows virtual machine environment
       - checkout
