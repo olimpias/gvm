@@ -56,4 +56,5 @@ workflows:
     jobs:
       - unit-tests
       - integration-test-linux
+      - integration-test-windows
 
