@@ -42,7 +42,8 @@ jobs:
 
   integration-test-windows:
     machine:
-      image: winamd64/golang:1.10-windowsservercore
+      image: windows-default
+    shell: powershell.exe
     resource_class: windows.medium
     steps:
       # Commands are run in a Windows virtual machine environment
