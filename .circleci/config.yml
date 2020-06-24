@@ -14,10 +14,6 @@ linuxGoEnv1_10: &linuxGoEnv1_10
     GOROOT: /usr/local/go
   working_directory: /go/src/github.com/olimpias/gvm
 
-windowsGoEnv1_10: &windowsGoEnv1_10
-  docker:
-    - image: winamd64/golang:1.10-windowsservercore
-
 jobs:
   unit-tests:
     <<: *linuxGoEnv1_14
