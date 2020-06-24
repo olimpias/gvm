@@ -11,31 +11,33 @@ linuxGoEnv1_14: &linuxGoEnv1_14
   working_directory: /go/src/github.com/olimpias/gvm
 
 linuxGoEnv1_10: &linuxGoEnv1_10
-    docker:
-      - image: golang:1.10
-    environment:
-      GOROOT: /usr/local/go
-    working_directory: /go/src/github.com/olimpias/gvm
+  docker:
+    - image: golang:1.10
+  environment:
+    GOROOT: /usr/local/go
+  working_directory: /go/src/github.com/olimpias/gvm
 
 jobs:
-    unit-tests:
-      <<: *linuxGoEnv1_14
-      steps:
-        - checkout
-        # specify any bash command here prefixed with `run: `
-        - run: go get -v -t -d ./...
-        - run: go test -v ./...
+  unit-tests:
+    <<: *linuxGoEnv1_14
+    steps:
+      - checkout
+      # specify any bash command here prefixed with `run: `
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
 
-    integration-test-linux:
-      <<: *linuxGoEnv1_10
-      steps:
-        - checkout
-        - run: go get ./...
-        - run: go build -o gvm ./cmd
-        - run: ./gvm dl 1.14.4
-        - run: ./gvm use 1.14.4
-        - run: go version
-        - run: '[[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1'
+  integration-test-linux:
+    <<: *linuxGoEnv1_10
+    steps:
+      - checkout
+      - run:
+          command: |
+            go get ./...
+            go build -o gvm ./cmd
+            ./gvm dl 1.14.4
+            ./gvm use 1.14.4
+            go version
+            [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
 workflows:
   version: 2
