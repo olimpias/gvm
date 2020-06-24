@@ -3,27 +3,27 @@
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
 
-linuxGoEnv1.14: &linuxGoEnv1.14
+linuxGoEnv1_14: &linuxGoEnv1_14
   docker:
     - image: golang:1.14
   working_directory: /go/src/github.com/olimpias/gvm
 
-linuxGoEnv1.10: &linuxGoEnv1.10
+linuxGoEnv1_10: &linuxGoEnv1_10
     docker:
       - image: golang:1.10
     working_directory: /go/src/github.com/olimpias/gvm
 
 jobs:
     unit-tests:
-      <<: *linuxGoEnv1.14
+      <<: *linuxGoEnv1_14
       steps:
         - checkout
         # specify any bash command here prefixed with `run: `
         - run: go get -v -t -d ./...
         - run: go test -v ./...
 
-    integration-test-v1.14.4:
-      <<: *linuxGoEnv1.10
+    integration-test-v1_14_4:
+      <<: *linuxGoEnv1_10
       steps:
         - checkout
         - run: go build -o gvm .
