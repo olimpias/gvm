@@ -47,12 +47,17 @@ jobs:
     environment:
       GOROOT: C:\Go
     resource_class: windows.medium
+    working_directory: C:\github.com\olimpias\gvm
     steps:
       # Commands are run in a Windows virtual machine environment
       - checkout
-      - run: echo $GOROOT
-      - run: go version
-      - run: where go
+      - run:
+          command: |
+            go build -o gvm ./cmd
+            ./gvm dl 1.14.4
+            ./gvm use 1.14.4
+            go version
+            [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1
 
 workflows:
   version: 2
