@@ -210,7 +210,9 @@ func (fm *FileManagement) unzipFile(srcPath, destPath string) error {
 		if f.Name == goFolder {
 			return nil
 		}
-		path := filepath.Join(destPath, f.Name)
+
+		actualFilePath := strings.TrimPrefix(f.Name, goFolder)
+		path := filepath.Join(destPath, actualFilePath)
 
 		if f.FileInfo().IsDir() {
 			if err := os.MkdirAll(path, 0755); err != nil {
