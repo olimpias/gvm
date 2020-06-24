@@ -26,7 +26,7 @@ jobs:
       <<: *linuxGoEnv1_10
       steps:
         - checkout
-        - run: go build -o gvm .
+        - run: go build -o gvm ./cmd
         - run: export GOROOT=/usr/local/go
         - run: ./gvm dl 1.14.4
         - run: ./gvm use 1.14.4
