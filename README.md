@@ -1,6 +1,6 @@
 # gvm
 
-[![GVM](https://circleci.com/gh/olimpias/gvm.svg?style=svg)](<https://app.circleci.com/pipelines/github/olimpias/gvm?branch=integration-tests-linux>)
+[![GVM](https://circleci.com/gh/olimpias/gvm.svg?style=svg)](<https://app.circleci.com/pipelines/github/olimpias/gvm>)
 
 
 gvm is a short version of `Go Version Manager`. It allows you to manage your installed go version and change its versions
