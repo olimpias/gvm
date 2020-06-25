@@ -14,6 +14,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/olimpias/gvm/logger"
+
 	"github.com/cheggaaa/pb/v3"
 )
 
@@ -80,6 +82,7 @@ func (fm *FileManagement) downloadFileWithURL(URL string) (io.ReadCloser, int64,
 }
 
 func (fm *FileManagement) DownloadGoPackage(version string) error {
+	logger.Info("Downloading...")
 	fileName := getCompressedFileName(version)
 	downloadDirectoryPath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 	out, err := os.OpenFile(downloadDirectoryPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
@@ -149,12 +152,19 @@ func (fm *FileManagement) iterateOverPackages(goVersionFileInfos []os.FileInfo) 
 	return versionNames
 }
 
-func (fm *FileManagement) UseGoPackage(version string) error {
+func (fm *FileManagement) CheckGoPackageExistence(version string) error {
 	fileName := getCompressedFileName(version)
 	filePath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 	if err := fm.validateFileExistence(filePath); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (fm *FileManagement) UseGoPackage(version string) error {
+	logger.Info(fmt.Sprintf("Switching to version %s...", version))
+	fileName := getCompressedFileName(version)
+	filePath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 
 	goroot, err := getGORoot()
 	if err != nil {

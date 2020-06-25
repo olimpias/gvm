@@ -55,7 +55,7 @@ Example Usage:
 
 ### Use Command
 Sets go version that you inputted into the command. It unzip the downloaded file and moves files into your `GOROOT` path. It may take sometime. In future versions, progressbar is going to be added.
-To able to use a go version, you need to download it before using `gvm dl <go-version>` [Download Command](#download-command)
+If you have not downloaded the version before, `use` command will trigger download of it as well. Then it will set the go version.
 
 Command Usage: `gvm use <go-version>`
 
@@ -106,8 +106,7 @@ You need to use it with `./` at the beginning. Example: `./gvm dl 1.14.4`
 
 For instance, if you want to install go `1.14.4`,
 
-First you need to run `./gvm dl 1.14.4` to download its tar.gz file.
-After that you need to run `./gvm use 1.14.4`. Once you run this command, it will replace existing go version with `1.14.4`.
+Use `./gvm use 1.14.4`. Once you run this command, it will replace existing go version with `1.14.4`.
 
 ## TODOs
 - [X] Add progressbar for unzipping
