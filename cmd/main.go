@@ -43,7 +43,7 @@ func main() {
 	case "help":
 		helper()
 	default:
-		terminateWithErr(fmt.Errorf("Unknown %s command for 'gvm' \n Run 'gvm help' for usage", os.Args[1]))
+		terminateWithErr(fmt.Errorf("Unknown %s command for 'gvm' \nRun 'gvm help' for usage", os.Args[1]))
 	}
 	if err := command.Validate(); err != nil {
 		terminateWithErr(err)
