@@ -149,12 +149,18 @@ func (fm *FileManagement) iterateOverPackages(goVersionFileInfos []os.FileInfo) 
 	return versionNames
 }
 
-func (fm *FileManagement) UseGoPackage(version string) error {
+func (fm *FileManagement) CheckGoPackageExistence(version string) error {
 	fileName := getCompressedFileName(version)
 	filePath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 	if err := fm.validateFileExistence(filePath); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (fm *FileManagement) UseGoPackage(version string) error {
+	fileName := getCompressedFileName(version)
+	filePath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 
 	goroot, err := getGORoot()
 	if err != nil {

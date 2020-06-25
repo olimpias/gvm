@@ -8,15 +8,17 @@ import (
 
 type PackageUser interface {
 	UseGoPackage(version string) error
+	CheckGoPackageExistence(version string) error
 }
 
 type UseCommand struct {
 	packageUser PackageUser
+	downloader  Downloader
 	version     string
 }
 
-func NewUseCommand(fileManager PackageUser, version string) *UseCommand {
-	return &UseCommand{packageUser: fileManager, version: version}
+func NewUseCommand(fileManager PackageUser, downloader Downloader, version string) *UseCommand {
+	return &UseCommand{packageUser: fileManager, downloader: downloader, version: version}
 }
 
 func (u *UseCommand) Validate() error {
@@ -29,5 +31,15 @@ func (u *UseCommand) Validate() error {
 }
 
 func (u *UseCommand) Apply() error {
+	err := u.packageUser.CheckGoPackageExistence(u.version)
+	switch {
+	case err == filesystem.ErrVersionIsNotFound:
+		if err := u.downloader.DownloadGoPackage(u.version); err != nil {
+			return err
+		}
+	case err != nil:
+		return err
+	}
+
 	return u.packageUser.UseGoPackage(u.version)
 }

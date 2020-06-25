@@ -18,7 +18,6 @@ func main() {
 		terminateWithErr(err)
 	}
 	var command commands.Command
-	//TODO add help
 	switch os.Args[1] {
 	case "dl":
 		ver, err := getVersionArg()
@@ -37,7 +36,7 @@ func main() {
 		if err != nil {
 			terminateWithErr(err)
 		}
-		command = commands.NewUseCommand(fileManager, ver)
+		command = commands.NewUseCommand(fileManager, fileManager, ver)
 	case "list":
 		command = commands.NewListCommand(fileManager)
 	case "help":

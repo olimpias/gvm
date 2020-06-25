@@ -45,3 +45,17 @@ func (mr *MockPackageUserMockRecorder) UseGoPackage(version interface{}) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseGoPackage", reflect.TypeOf((*MockPackageUser)(nil).UseGoPackage), version)
 }
+
+// CheckGoPackageExistence mocks base method
+func (m *MockPackageUser) CheckGoPackageExistence(version string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckGoPackageExistence", version)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CheckGoPackageExistence indicates an expected call of CheckGoPackageExistence
+func (mr *MockPackageUserMockRecorder) CheckGoPackageExistence(version interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckGoPackageExistence", reflect.TypeOf((*MockPackageUser)(nil).CheckGoPackageExistence), version)
+}

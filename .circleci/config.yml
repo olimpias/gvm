@@ -31,7 +31,6 @@ jobs:
           command: |
             go get ./...
             go build -o gvm ./cmd
-            ./gvm dl 1.14.4
             ./gvm use 1.14.4
             go version
             [[ $(go version) == "go version go1.14.4 linux/amd64" ]] && exit 0 || exit 1

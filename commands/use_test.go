@@ -15,16 +15,19 @@ func TestNewUseCommand(t *testing.T) {
 	tests := []struct {
 		inputVersion string
 		packageUser  PackageUser
+		downloader   Downloader
 	}{
 		{
 			inputVersion: "1.4.1",
 			packageUser:  &filesystem.FileManagement{},
+			downloader:   &filesystem.FileManagement{},
 		},
 	}
 
 	for _, test := range tests {
-		useCommand := NewUseCommand(test.packageUser, test.inputVersion)
+		useCommand := NewUseCommand(test.packageUser, test.downloader, test.inputVersion)
 		assert.Equal(t, test.packageUser, useCommand.packageUser, "Got %v, but expected %v", useCommand.packageUser, test.packageUser)
+		assert.Equal(t, test.downloader, useCommand.downloader, "Got %v, but expected %v", useCommand.packageUser, test.packageUser)
 		assert.Equal(t, test.inputVersion, useCommand.version, "Got %v, but expected %v", useCommand.version, test.inputVersion)
 	}
 }
@@ -69,18 +72,45 @@ func TestUseValidate(t *testing.T) {
 
 func TestUseApply(t *testing.T) {
 	tests := []struct {
-		name         string
-		inputVersion string
-		expectedErr  error
+		name                           string
+		inputVersion                   string
+		numCheckGoPackageExistenceCall int
+		errCheckGoPackageExistence     error
+		numDownloaderCall              int
+		errDownloader                  error
+		numPackageUserCall             int
+		errPackageUser                 error
+		expectedErr                    error
 	}{
 		{
-			name:         "success without err",
-			inputVersion: "1.4.1",
+			name:                           "success without err",
+			inputVersion:                   "1.4.1",
+			numCheckGoPackageExistenceCall: 1,
+			numPackageUserCall:             1,
 		},
 		{
-			name:         "failed with err",
-			inputVersion: "1.4.1",
-			expectedErr:  dummyErr,
+			name:                           "success with download",
+			inputVersion:                   "1.4.1",
+			numCheckGoPackageExistenceCall: 1,
+			errCheckGoPackageExistence:     filesystem.ErrVersionIsNotFound,
+			numDownloaderCall:              1,
+			numPackageUserCall:             1,
+		},
+		{
+			name:                           "failed with file check",
+			inputVersion:                   "1.4.1",
+			numCheckGoPackageExistenceCall: 1,
+			errCheckGoPackageExistence:     dummyErr,
+			expectedErr:                    dummyErr,
+		},
+		{
+			name:                           "failed with err from download",
+			inputVersion:                   "1.4.1",
+			numCheckGoPackageExistenceCall: 1,
+			errCheckGoPackageExistence:     filesystem.ErrVersionIsNotFound,
+			numDownloaderCall:              1,
+			errDownloader:                  dummyErr,
+			expectedErr:                    dummyErr,
 		},
 	}
 
@@ -89,8 +119,12 @@ func TestUseApply(t *testing.T) {
 			controller := gomock.NewController(t)
 			defer controller.Finish()
 			mockPackageUser := mock.NewMockPackageUser(controller)
-			mockPackageUser.EXPECT().UseGoPackage(test.inputVersion).Return(test.expectedErr).Times(1)
-			useCom := NewUseCommand(mockPackageUser, test.inputVersion)
+			mockPackageUser.EXPECT().UseGoPackage(test.inputVersion).Return(test.errPackageUser).Times(test.numPackageUserCall)
+			mockPackageUser.EXPECT().CheckGoPackageExistence(test.inputVersion).Return(test.errCheckGoPackageExistence).
+				Times(test.numCheckGoPackageExistenceCall)
+			mockDownloader := mock.NewMockDownloader(controller)
+			mockDownloader.EXPECT().DownloadGoPackage(test.inputVersion).Return(test.errDownloader).Times(test.numDownloaderCall)
+			useCom := NewUseCommand(mockPackageUser, mockDownloader, test.inputVersion)
 			outputErr := useCom.Apply()
 			assert.Equal(t, test.expectedErr, outputErr, "Got %v, but expected %v", outputErr, test.expectedErr)
 		})
