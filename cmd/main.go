@@ -7,6 +7,7 @@ import (
 
 	"github.com/olimpias/gvm/commands"
 	"github.com/olimpias/gvm/filesystem"
+	"github.com/olimpias/gvm/logger"
 )
 
 func main() {
@@ -61,16 +62,14 @@ func getVersionArg() (string, error) {
 }
 
 func terminateWithErr(err error) {
-	os.Stderr.WriteString(fmt.Sprintf("Err: %s  \n", err))
-	os.Exit(1)
+	logger.ExitWithError(fmt.Sprintf("Err: %s  \n", err))
 }
 
 func helper() {
-	os.Stdout.WriteString("gvm is a go version controller\n")
-	os.Stdout.WriteString("Commands:\n")
-	os.Stdout.WriteString("list  list the possible downloaded versions that ready to use.\n")
-	os.Stdout.WriteString("dl    downloads the version that you specify to your machine.\n")
-	os.Stdout.WriteString("use   uses the version that specify as an input. It has to be downloaded first using dl command.\n")
-	os.Stdout.WriteString("del   deletes the version that you specify as an input\n")
-	os.Exit(0)
+	logger.Info("gvm is a go version controller\n")
+	logger.Info("Commands:\n")
+	logger.Info("list  list the possible downloaded versions that ready to use.\n")
+	logger.Info("dl    downloads the version that you specify to your machine.\n")
+	logger.Info("use   uses the version that specify as an input. It has to be downloaded first using dl command.\n")
+	logger.ExitWithInfo("del   deletes the version that you specify as an input\n")
 }
