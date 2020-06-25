@@ -12,7 +12,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		terminateWithErr(errors.New("No command is set for 'gvm' \n Run 'gvm help' for usage"))
+		terminateWithErr(errors.New("No command is set for 'gvm' \nRun 'gvm help' for usage"))
 	}
 	fileManager, err := filesystem.New()
 	if err != nil {
@@ -43,7 +43,7 @@ func main() {
 	case "help":
 		helper()
 	default:
-		terminateWithErr(fmt.Errorf("Err: Unknown %s command for 'gvm' \n Run 'gvm help' for usage", os.Args[1]))
+		terminateWithErr(fmt.Errorf("Unknown %s command for 'gvm' \n Run 'gvm help' for usage", os.Args[1]))
 	}
 	if err := command.Validate(); err != nil {
 		terminateWithErr(err)
@@ -71,5 +71,5 @@ func helper() {
 	logger.Info("list  list the possible downloaded versions that ready to use.\n")
 	logger.Info("dl    downloads the version that you specify to your machine.\n")
 	logger.Info("use   uses the version that specify as an input. It has to be downloaded first using dl command.\n")
-	logger.ExitWithInfo("del   deletes the version that you specify as an input\n")
+	logger.ExitWithInfo("del   deletes the version that you specify as an input.\n")
 }
