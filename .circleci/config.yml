@@ -74,4 +74,5 @@ workflows:
       - unit-tests
       - integration-test-linux
       - integration-test-windows
+      - integration-test-initial-setup-linux
 
