@@ -66,6 +66,8 @@ jobs:
             unset GOROOT
             ./gvm use 1.14.1
             echo "usage is finished"
+            stty sane
+            tput rs1
             go version
             [[ $(go version) == "go version go1.14.1 linux/amd64" ]] && exit 0 || exit 1
 
