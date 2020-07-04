@@ -61,11 +61,12 @@ jobs:
       - run:
           command: |
             go build -o gvm ./cmd
+            PATH=$(echo "$PATH" | sed -e 's/:\/usr\/local\/go$//')
             echo $PATH
-            echo $GOROOT
             unset GOROOT
-            echo $GOROOT
-            echo "testing"
+            ./gvm use 1.14.1
+            go version
+            [[ $(go version) == "go version go1.14.1 linux/amd64" ]] && exit 0 || exit 1
 
 workflows:
   version: 2
