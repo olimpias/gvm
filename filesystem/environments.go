@@ -30,6 +30,8 @@ var (
 type EnvConfigurator interface {
 	GetGoRoot() (string, error)
 	GetHomePath() string
+	ShouldSetInPathVariable() bool
+	SetFilePathToPathVariable(path string) error
 }
 
 type EnvVariableManager struct {

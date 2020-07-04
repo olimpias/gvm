@@ -185,6 +185,12 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 		return fmt.Errorf("failed to unzip file. Err: %s", err)
 	}
 
+	if fm.env.ShouldSetInPathVariable() {
+		if err := fm.env.SetFilePathToPathVariable(goroot); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
