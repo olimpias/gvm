@@ -167,7 +167,7 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 		return err
 	}
 	if err := fm.validateFileExistence(goroot); err != nil {
-		if err := fm.createDirectory(storePath); err != nil {
+		if err := fm.createDirectory(goroot); err != nil {
 			return err
 		}
 	}
