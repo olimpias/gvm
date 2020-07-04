@@ -50,17 +50,11 @@ func TestUseValidate(t *testing.T) {
 			goRootEnv:    "/test/test",
 			expected:     filesystem.ErrInvalidVersion,
 		},
-		{
-			name:         "failed due to empty goRoot",
-			inputVersion: "1.1.4",
-			goRootEnv:    "",
-			expected:     filesystem.ErrGORootIsNotFound,
-		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if err := os.Setenv(filesystem.GORooT, test.goRootEnv); err != nil {
+			if err := os.Setenv(filesystem.GORooTEnvVariable, test.goRootEnv); err != nil {
 				t.Error(err)
 			}
 			useCommand := UseCommand{version: test.inputVersion}

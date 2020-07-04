@@ -54,6 +54,19 @@ jobs:
             go version
             [[ $(go version) == "go version go1.14.4 windows/amd64" ]] && exit 0 || exit 1
 
+  integration-test-initial-setup-linux:
+    <<: *linuxGoEnv1_14
+    steps:
+      - checkout
+      - run:
+          command: |
+            go build -o gvm ./cmd
+            echo $PATH
+            echo $GOROOT
+            unset $GOROOT
+            echo $GOROOT
+            echo "testing"
+
 workflows:
   version: 2
   all:
