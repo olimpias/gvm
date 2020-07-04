@@ -54,6 +54,21 @@ jobs:
             go version
             [[ $(go version) == "go version go1.14.4 windows/amd64" ]] && exit 0 || exit 1
 
+  integration-test-initial-setup-linux:
+    <<: *linuxGoEnv1_14
+    steps:
+      - checkout
+      - run:
+          command: |
+            go build -o gvm ./cmd
+            echo "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ~/.bashrc
+            source ~/.bashrc
+            unset GOROOT
+            ./gvm use 1.14.1
+            source ~/.bashrc
+            go version
+            [[ $(go version) == "go version go1.14.1 linux/amd64" ]] && exit 0 || exit 1
+
 workflows:
   version: 2
   all:
@@ -61,4 +76,5 @@ workflows:
       - unit-tests
       - integration-test-linux
       - integration-test-windows
+      - integration-test-initial-setup-linux
 

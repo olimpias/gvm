@@ -22,11 +22,6 @@ func NewUseCommand(fileManager PackageUser, downloader Downloader, version strin
 }
 
 func (u *UseCommand) Validate() error {
-	err := filesystem.ValidateOperation()
-	if err != nil {
-		return err
-	}
-
 	return filesystem.ValidateVersion(u.version)
 }
 

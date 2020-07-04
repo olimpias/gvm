@@ -26,15 +26,10 @@ const (
 	tmpFile   = ".tmp"
 	goFolder  = "go/"
 
-	home                = "HOME"
 	downloadURL         = "https://dl.google.com/go/%s"
 	downloadFileVersion = "go%s"
 	downloadFileOSArch  = ".%s-%s.tar.gz"
 	downloadFileOSArchW = ".%s-%s.zip"
-
-	unixBashSourceCmd = "source"
-	unixBashProfile   = ".bash_profile"
-	unixExportPath    = "export PATH=$PATH:/usr/local/go/bin"
 )
 
 var (
@@ -42,6 +37,7 @@ var (
 )
 
 type FileManagement struct {
+	env                EnvConfigurator
 	directoryStorePath string
 	osName             string
 	archName           string
@@ -56,9 +52,10 @@ type mockOSOperation interface {
 }
 
 func New() (*FileManagement, error) {
-	homePath := os.Getenv(home)
+	envConf := &EnvVariableManager{}
+	homePath := envConf.GetHomePath()
 	storePath := fmt.Sprintf("%s/%s", homePath, storePath)
-	fm := &FileManagement{directoryStorePath: storePath, osName: runtime.GOOS, archName: runtime.GOARCH}
+	fm := &FileManagement{directoryStorePath: storePath, osName: runtime.GOOS, archName: runtime.GOARCH, env: envConf}
 	if err := fm.validateFileExistence(storePath); err != nil {
 		if err := fm.createDirectory(storePath); err != nil {
 			return nil, err
@@ -96,7 +93,6 @@ func (fm *FileManagement) DownloadGoPackage(version string) error {
 		return err
 	}
 	defer reader.Close()
-
 	bar := pb.Full.Start64(fileSize)
 	defer bar.Finish()
 	barReader := bar.NewProxyReader(reader)
@@ -166,9 +162,14 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 	fileName := getCompressedFileName(version)
 	filePath := fmt.Sprintf("%s%s", fm.directoryStorePath, fileName)
 
-	goroot, err := getGORoot()
+	goroot, err := fm.env.GetGoRoot()
 	if err != nil {
 		return err
+	}
+	if err := fm.validateFileExistence(goroot); err != nil {
+		if err := fm.createDirectory(goroot); err != nil {
+			return err
+		}
 	}
 
 	tmpFilePath := fmt.Sprintf("%s%s", fm.directoryStorePath, tmpFile)
@@ -182,6 +183,12 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 
 	if err := fm.extractCompressedFile(filePath, goroot); err != nil {
 		return fmt.Errorf("failed to unzip file. Err: %s", err)
+	}
+
+	if fm.env.ShouldSetInPathVariable() {
+		if err := fm.env.SetFilePathToPathVariable(goroot); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -393,26 +400,3 @@ func (fm *FileManagement) removeDirectoryContents(path string) error {
 func (fm *FileManagement) createDirectory(directoryPath string) error {
 	return os.MkdirAll(directoryPath, os.ModePerm)
 }
-
-////Private for now. Maybe in the future if user does not have installed go before. It might be use for initial installation...
-//func (fm *FileManagement) setEnvVariable() error {
-//	homePath := os.Getenv(home)
-//	bashProfilePath := fmt.Sprintf("%s/%s", homePath, unixBashProfile)
-//	f, err := os.OpenFile(bashProfilePath, os.O_APPEND|os.O_WRONLY, 0644)
-//	if err != nil {
-//		return err
-//	}
-//	defer f.Close()
-//	values, err := ioutil.ReadAll(f)
-//	if err != nil {
-//		return err
-//	}
-//	if strings.Contains(string(values), unixExportPath) {
-//		return ErrBashProfileAlreadySet
-//	}
-//	if _, err := f.WriteString(unixExportPath); err != nil {
-//		return err
-//	}
-//	cmd := exec.Command(unixBashSourceCmd, bashProfilePath)
-//	return cmd.Run()
-//}
