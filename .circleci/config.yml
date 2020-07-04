@@ -62,8 +62,6 @@ jobs:
           command: |
             go build -o gvm ./cmd
             PATH=$(echo "$PATH" | sed -e 's/:\/usr\/local\/go\/bin$//')
-            echo "export PATH=$PATH" >> ~/.bashrc
-            source ~/.bashrc
             echo $PATH
             unset GOROOT
             ./gvm use 1.14.1
