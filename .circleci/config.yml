@@ -63,7 +63,7 @@ jobs:
             go build -o gvm ./cmd
             echo $PATH
             echo $GOROOT
-            unset $GOROOT
+            unset GOROOT
             echo $GOROOT
             echo "testing"
 
