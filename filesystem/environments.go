@@ -31,7 +31,7 @@ type EnvConfigurator interface {
 	GetGoRoot() (string, error)
 	GetHomePath() string
 	ShouldSetInPathVariable() bool
-	SetFilePathToPathVariable(path string) error
+	SetFilePathToPathVariable(goRoot string) error
 }
 
 type EnvVariableManager struct {
@@ -91,6 +91,6 @@ func (m *EnvVariableManager) ShouldSetInPathVariable() bool {
 	return err != nil
 }
 
-func (m *EnvVariableManager) SetFilePathToPathVariable(path string) error {
-	return penv.AppendEnv(pathEnvVariable, path)
+func (m *EnvVariableManager) SetFilePathToPathVariable(goRoot string) error {
+	return penv.AppendEnv(pathEnvVariable, fmt.Sprintf("%s/%s", goRoot, trimGoPathSuffix))
 }
