@@ -63,12 +63,9 @@ jobs:
             go build -o gvm ./cmd
             echo "export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ~/.bashrc
             source ~/.bashrc
-            echo $PATH
             unset GOROOT
             ./gvm use 1.14.1
-            echo "usage is finished"
             source ~/.bashrc
-            echo $PATH
             go version
             [[ $(go version) == "go version go1.14.1 linux/amd64" ]] && exit 0 || exit 1
 
