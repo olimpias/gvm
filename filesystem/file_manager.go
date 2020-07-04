@@ -30,10 +30,6 @@ const (
 	downloadFileVersion = "go%s"
 	downloadFileOSArch  = ".%s-%s.tar.gz"
 	downloadFileOSArchW = ".%s-%s.zip"
-
-	unixBashSourceCmd = "source"
-	unixBashProfile   = ".bash_profile"
-	unixExportPath    = "export PATH=$PATH:/usr/local/go/bin"
 )
 
 var (
