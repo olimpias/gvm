@@ -64,7 +64,9 @@ jobs:
             PATH=$(echo "$PATH" | sed -e 's/:\/usr\/local\/go$//')
             echo $PATH
             unset GOROOT
+            reset
             ./gvm use 1.14.1
+            echo "usage is finished"
             go version
             [[ $(go version) == "go version go1.14.1 linux/amd64" ]] && exit 0 || exit 1
 
