@@ -166,6 +166,11 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 	if err != nil {
 		return err
 	}
+	if err := fm.validateFileExistence(goroot); err != nil {
+		if err := fm.createDirectory(storePath); err != nil {
+			return err
+		}
+	}
 
 	tmpFilePath := fmt.Sprintf("%s%s", fm.directoryStorePath, tmpFile)
 	if err := fm.createDirectory(tmpFilePath); err != nil {
