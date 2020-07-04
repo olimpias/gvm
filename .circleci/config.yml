@@ -64,10 +64,12 @@ jobs:
             PATH=$(echo "$PATH" | sed -e 's/:\/usr\/local\/go$//')
             echo "export PATH=$PATH" >> ~/.bashrc
             source ~/.bashrc
+            echo $PATH
             unset GOROOT
             ./gvm use 1.14.1
             echo "usage is finished"
             source ~/.bashrc
+            echo $PATH
             go version
             [[ $(go version) == "go version go1.14.1 linux/amd64" ]] && exit 0 || exit 1
 
