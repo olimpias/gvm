@@ -8,9 +8,11 @@ import (
 	"github.com/olimpias/gvm/commands"
 	"github.com/olimpias/gvm/filesystem"
 	"github.com/olimpias/gvm/logger"
+	"github.com/olimpias/gvm/version"
 )
 
 func main() {
+	version.Print()
 	if len(os.Args) < 2 {
 		terminateWithErr(errors.New("No command is set for 'gvm' \nRun 'gvm help' for usage"))
 	}
