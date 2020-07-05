@@ -79,11 +79,11 @@ func (m *EnvVariableManager) getGoRootFromPathEnv() (string, error) {
 }
 
 func (m *EnvVariableManager) getCurrentGORoot() (string, error) {
-	goPath := os.Getenv(GORooTEnvVariable)
-	if goPath == "" {
+	goRoot := os.Getenv(GORooTEnvVariable)
+	if goRoot == "" {
 		return "", ErrGORootIsNotFound
 	}
-	return goPath, nil
+	return goRoot, nil
 }
 
 func (m *EnvVariableManager) ShouldSetInPathVariable() bool {
