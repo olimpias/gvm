@@ -3,14 +3,17 @@ mkdir -p "release"
 for f in $FILES
 do
   echo "Processing $f file..."
-  cp "$f" "gvm"
   if [[ $f == *"windows"* ]]
   then
-    zip "$f.zip" "gvm"
+    cp "$f" gvm.exe
+    zip "$f.zip" gvm.exe
     mv "$f.zip" ./release
+    rm -rf gvm.exe
   else
-    tar -zcvf "$f.tar.gz" "gvm"
+    cp "$f" "dist/gvm"
+    tar -C dist -zcvf "$f.tar.gz" gvm
     mv "$f.tar.gz" ./release
+    rm -rf dist/gvm
   fi
   rm -rf "$f"
 done

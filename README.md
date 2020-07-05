@@ -3,22 +3,68 @@
 [![GVM](https://circleci.com/gh/olimpias/gvm.svg?style=svg)](<https://app.circleci.com/pipelines/github/olimpias/gvm>)
 
 
-gvm is a short version of `Go Version Manager`. It allows you to manage your installed go version and change its versions
+gvm is a short name of `Go Version Manager`. It allows you to manage your go versions and change versions
 according to your requirements. It is completely written in Go and provides cross-platform usability
 
-Supports macOS and windows with release binaries. It requires to preinstalled go(for now...) and `GOPATH` to be
-set in environmental variables. In addition to that, the user privileges must be set to run the program. Otherwise, there will
-be permission issues to change and replace folders.
+gvm supports Windows, Linux, Freebsd and MacOS. It requires to preinstalled go for windows and `GOROOT` to be
+set in environmental variables for windows. In addition to that, the user privileges must be set to run the program for all OSs. Otherwise, there will
+be permission issues while removing and replacing the folders/files. [Check Troubleshooting section](#Troubleshooting).
 
 ## Installation
 
-Download release version from [releases](https://github.com/olimpias/gvm/releases) according to your operating system. For now, releases are done for macOS and windows 64 bit.
+**Linux**:
+```shell script
+#Example for amd64 arch
+# Linux Example (assumes ~/bin is in PATH).
+curl -o gvm.tar.gz -O https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.linux.amd64.tar.gz
+tar -C ~/bin -xzf gvm.tar.gz
+chmod +x ~/bin/gvm
+gvm use 1.14.4
+```
+
+Supported Archs For Linux : `386`, `amd64`, `arm`, `arm64`, `mips`, `mipsle`, `mips64`, `mips64le`, `ppc64`, `ppc64le`, `s390x`
+
+**MacOS**: 
+```shell script
+# Example for amd64 arch
+curl -o gvm.tar.gz -O https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.darwin.amd64.tar.gz
+tar -C /usr/local/bin -xzf gvm.tar.gz
+chmod +x /usr/local/bin/gvm
+gvm use 1.14.4
+```
+
+Supported Archs For MacOs : `amd64`
+
+**Windows**:
+```shell script
+# Example for amd64 arch
+curl -o gvm.zip -O https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.windows.amd64.exe.zip
+unzip gvm.zip
+gvm use 1.14.4
+```
+
+Supported Archs For MacOs : `386`, `amd64`
+
+**FreeBSD**:
+```shell script
+#Example for amd64 arch
+# Freebsd Example (assumes ~/bin is in PATH).
+curl -o gvm.tar.gz -O https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.freebsd.amd64.tar.gz
+tar -C ~/bin -xzf gvm.tar.gz
+chmod +x ~/bin/gvm
+gvm use 1.14.4
+```
+
+Supported Archs For Freebsd : `386`, `amd64`, `arm`, `arm64`
+
+
+To support use other architecture, you just need to change **amd64** in the link for `curl` command.
+
+**Note:** If you are trying to install go for the first time, it will not work for Windows OS. It requires preinstalled go for windows.
+
+Download release version from [releases](https://github.com/olimpias/gvm/releases) according to your operating system and architecture.
 
 Extract the executable from tar/zip. Then enjoy it!
-
-**Note:** If you are trying to install go with this file, you have to set bash configuration by yourself. Also, **gvm** requires `GOROOT` environmental variable.
-
-Checkout example for [setting up environment](#setting-up-env-for-v001-from-scratch-in-macos)
 
 ## Command Usages
 gvm provides 5 type of commands that you can apply; `help`, `list`, `use`, `download` and `del`
@@ -80,36 +126,15 @@ list  list the possible downloaded versions that ready to use.
 dl    downloads the version that you specify to your machine.
 use   uses the version that specify as an input. It has to be downloaded first using dl command.
 del   deletes the version that you specify as an input
+``` 
+
+## Troubleshooting
+
+When Go is installed by default installer, the created folder could have access restrictions. If it is the case please use
+following command to bypass it.
+
+Mostly Go is installed to `/usr/local/go` path by default installer. We need to grant access for `/usr/local/go` file path.
+
+```shell script
+sudo chmod -R 755 /usr/local/go
 ```
-
-## Setting Up Env For v0.0.1 From Scratch in MacOS
-
-Be sure if go is installed. Otherwise it is hardly recommended to install for alpha version.
-
-Then, check if `goroot` is set with  `echo $GOROOT`.
-
-If it returns empty try using `which go`, this will return go path.
-
-Set env with `export GOROOT=PATH`(put result from `which go` command, you should exclude /bin/go in path). For default installation it is most likely `/usr/local/go`. It is recommanded to add it to bash profile
-otherwise you need to set `GOROOT` into environmental variable all the time to use **gvm**.
-Example result `/usr/local/go/bin/go`, you need to use `/usr/local/go` as `GOROOT`.
-
-Check the permission for users. Most likely for default installation it is assigned to root user and your current user does not have access for that directory to edit.
-
-Go to `cd $GOROOT/..` path and use `sudo chmod -R 777 go` or `sudo chmod -R 755 go`.
-
-Click [link](https://github.com/olimpias/gvm/releases/download/v0.0.1/gvm_0.0.1.darwin-amd64.tar.gz) to download tar file.
-
-Use `tar xvf gvm_0.0.1.darwin-amd64.tar.gz` to extract tar file and it will extract `gvm` executable. It is ready for use
-
-You need to use it with `./` at the beginning. Example: `./gvm dl 1.14.4`
-
-For instance, if you want to install go `1.14.4`,
-
-Use `./gvm use 1.14.4`. Once you run this command, it will replace existing go version with `1.14.4`.
-
-## TODOs
-- [X] Add progressbar for unzipping
-- [X] Add CI/CD for testing windows and linux over circleci
-- [ ] Add executable as a downloadable so that it could be usable through homebrew or other example platforms.
-- [ ] Provide initial installation of go(without preinstalled go) with executable file.
