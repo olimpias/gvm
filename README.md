@@ -16,7 +16,7 @@ be permission issues while removing and replacing the folders/files. [Check Trou
 ```shell script
 #Example for amd64 arch
 # Linux Example (assumes ~/bin is in PATH).
-curl -o gvm.tar.gz -OL https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.linux.amd64.tar.gz
+curl -o gvm.tar.gz -OL https://github.com/olimpias/gvm/releases/download/v0.1.1/gvm.linux.amd64.tar.gz
 tar -C ~/bin -xzf gvm.tar.gz
 chmod +x ~/bin/gvm
 gvm use 1.14.4
@@ -27,7 +27,7 @@ Supported Archs For Linux : `386`, `amd64`, `arm`, `arm64`, `mips`, `mipsle`, `m
 **MacOS**: 
 ```shell script
 # Example for amd64 arch
-curl -o gvm.tar.gz -OL https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.darwin.amd64.tar.gz
+curl -o gvm.tar.gz -OL https://github.com/olimpias/gvm/releases/download/v0.1.1/gvm.darwin.amd64.tar.gz
 tar -C /usr/local/bin -xzf gvm.tar.gz
 chmod +x /usr/local/bin/gvm
 gvm use 1.14.4
@@ -39,7 +39,7 @@ Supported Archs For MacOs : `amd64`
 ```shell script
 # Example for amd64 arch
 # Expected to use bash terminal
-curl -o gvm.zip -OL https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.windows.amd64.exe.zip
+curl -o gvm.zip -OL https://github.com/olimpias/gvm/releases/download/v0.1.1/gvm.windows.amd64.exe.zip
 unzip gvm.zip
 gvm use 1.14.4
 ```
@@ -50,7 +50,7 @@ Supported Archs For MacOs : `386`, `amd64`
 ```shell script
 #Example for amd64 arch
 # Freebsd Example (assumes ~/bin is in PATH).
-curl -o gvm.tar.gz -OL https://github.com/olimpias/gvm/releases/download/v0.1.0/gvm.freebsd.amd64.tar.gz
+curl -o gvm.tar.gz -OL https://github.com/olimpias/gvm/releases/download/v0.1.1/gvm.freebsd.amd64.tar.gz
 tar -C ~/bin -xzf gvm.tar.gz
 chmod +x ~/bin/gvm
 gvm use 1.14.4
