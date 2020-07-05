@@ -177,7 +177,7 @@ func (fm *FileManagement) UseGoPackage(version string) error {
 		return err
 	}
 
-	if err := fm.removeDirectoryContents(fmt.Sprintf("%s/", goroot)); err != nil {
+	if err := fm.removeDirectoryContents(fmt.Sprintf("%s", goroot)); err != nil {
 		return fmt.Errorf("removing files and directories in goroot folder failed. Err: %s. The goroot path %s", err, goroot)
 	}
 
@@ -348,25 +348,32 @@ func (fm *FileManagement) moveFilesToDestForTarType(reader io.Reader, totalSize 
 				return err
 			}
 		case tar.TypeReg:
-			outFile, err := os.Create(fPath)
-			if err != nil {
+			if err := fm.moveFile(fPath, tarReader); err != nil {
 				return err
-			}
-			defer outFile.Close()
-			if _, err := io.Copy(outFile, tarReader); err != nil {
-				return err
-			}
-
-			if !isWindowOS() {
-				if err := outFile.Chmod(0755); err != nil {
-					return err
-				}
 			}
 		default:
 			return fmt.Errorf("unknow type: %d in %s", header.Typeflag, header.Name)
 		}
 	}
 
+	return nil
+}
+
+func (fm *FileManagement) moveFile(dstPath string, src io.Reader) error {
+	outFile, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+	if _, err := io.Copy(outFile, src); err != nil {
+		return err
+	}
+
+	if !isWindowOS() {
+		if err := outFile.Chmod(0755); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

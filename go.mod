@@ -8,5 +8,6 @@ require (
 	github.com/golang/mock v1.4.3
 	github.com/lxn/win v0.0.0-20191128105842-2da648fda5b4 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
+	github.com/mitchellh/gox v1.0.1 // indirect
 	github.com/stretchr/testify v1.6.1
 )
