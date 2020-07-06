@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	"github.com/olimpias/gvm/logger"
@@ -145,6 +146,7 @@ func (fm *FileManagement) iterateOverPackages(goVersionFileInfos []os.FileInfo) 
 		fileName := file.Name()
 		versionNames = append(versionNames, fileName[:len(fileName)-len(fileExtraction)])
 	}
+	sort.SliceStable(versionNames, func(i, j int) bool { return versionNames[i] > versionNames[j] })
 	return versionNames
 }
 
